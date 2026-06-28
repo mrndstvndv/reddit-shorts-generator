@@ -1,5 +1,6 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+@using BlazorApp1.Services
 @inject RedditService Reddit
 
 <input @bind="url" placeholder="Paste a Reddit post URL" class="form-control mb-2 border" />
@@ -32,10 +33,19 @@
         title = null;
         body = null;
 
-        var result = await Reddit.GetPost(url);
-
-        error = result.Error;
-        title = result.Title;
-        body = result.Text;
+        try
+        {
+            var post = await Reddit.GetPost(url);
+            title = post.Title;
+            body = post.Text;
+        }
+        catch (RedditFetchException ex)
+        {
+            error = ex.Message;
+        }
+        catch (RedditPostNotFoundException ex)
+        {
+            error = ex.Message;
+        }
     }
 }
