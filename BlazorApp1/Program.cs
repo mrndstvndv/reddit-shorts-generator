@@ -11,6 +11,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<RedditService>();
+builder.Services.AddSingleton<EdgeTtsService>();
 
 
 var app = builder.Build();
