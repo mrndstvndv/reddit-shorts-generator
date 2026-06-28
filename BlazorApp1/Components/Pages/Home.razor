@@ -3,73 +3,75 @@
 @using BlazorApp1.Services
 @inject RedditService Reddit
 
-<div class="min-h-screen bg-slate-950 text-slate-100 p-6 flex flex-col items-center justify-center">
-    <div class="w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-lg p-6">
-        <h1 class="text-2xl font-bold text-center text-white mb-1">Reddit Title Card Generator</h1>
-        <p class="text-slate-400 text-sm text-center mb-6">Enter a post URL to generate an image card</p>
+<div class="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-neutral-200 p-6 flex flex-col items-center justify-center transition-colors duration-300">
+    <div class="w-full max-w-4xl border border-neutral-200 dark:border-neutral-800 rounded-lg p-6 bg-white dark:bg-black">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">Reddit Title Card Generator</h1>
+            <p class="text-neutral-500 dark:text-neutral-400 text-sm mt-1">Replicate official Reddit style posts as stunning images</p>
+        </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Form -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Left panel: Form Controls -->
             <div class="space-y-4">
-                <div class="flex flex-col gap-1">
-                    <span class="text-xs font-semibold text-slate-400">Post URL</span>
+                <div class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Post URL</span>
                     <div class="flex gap-2">
-                        <input @bind="url" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-white w-full" placeholder="https://www.reddit.com/r/..." />
-                        <button @onclick="GetPost" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded">Fetch</button>
+                        <input @bind="url" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors" placeholder="https://www.reddit.com/r/..." />
+                        <button @onclick="GetPost" class="bg-neutral-950 dark:bg-white hover:bg-neutral-900 dark:hover:bg-neutral-100 text-white dark:text-black text-sm font-medium px-4 py-2 rounded transition-colors whitespace-nowrap">Fetch</button>
                     </div>
                 </div>
 
                 @if (error is not null)
                 {
-                    <div class="bg-red-950/40 border border-red-900 text-red-400 text-xs p-3 rounded">
+                    <div class="border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 text-xs p-3 rounded">
                         @error
                     </div>
                 }
 
                 @if (post is not null)
                 {
-                    <div class="border-t border-slate-800 pt-4 space-y-4">
-                        <div class="flex flex-col gap-1">
-                            <span class="text-xs font-semibold text-slate-400">Title</span>
-                            <textarea @bind="postTitle" rows="3" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-white w-full resize-y"></textarea>
+                    <div class="border-t border-neutral-200 dark:border-neutral-800 pt-4 space-y-4">
+                        <div class="flex flex-col gap-1.5">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Title</span>
+                            <textarea @bind="postTitle" rows="3" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors resize-y"></textarea>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="flex flex-col gap-1">
-                                <span class="text-xs font-semibold text-slate-400">Subreddit</span>
-                                <input @bind="subredditName" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-xs text-white" />
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="flex flex-col gap-1.5">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Subreddit</span>
+                                <input @bind="subredditName" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors" />
                             </div>
-                            <div class="flex flex-col gap-1">
-                                <span class="text-xs font-semibold text-slate-400">Icon Path</span>
-                                <input @bind="subredditIconPath" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-xs text-white" placeholder="URL/Path" />
+                            <div class="flex flex-col gap-1.5">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Icon Path</span>
+                                <input @bind="subredditIconPath" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors" placeholder="URL/Path" />
                             </div>
-                            <div class="flex flex-col gap-1">
-                                <span class="text-xs font-semibold text-slate-400">Author</span>
-                                <input @bind="username" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-xs text-white" />
+                            <div class="flex flex-col gap-1.5">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Author</span>
+                                <input @bind="username" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors" />
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="flex flex-col gap-1">
-                                <span class="text-xs font-semibold text-slate-400">Votes</span>
-                                <input @bind="votes" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-xs text-white" />
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="flex flex-col gap-1.5">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Votes</span>
+                                <input @bind="votes" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors" />
                             </div>
-                            <div class="flex flex-col gap-1">
-                                <span class="text-xs font-semibold text-slate-400">Comments</span>
-                                <input @bind="comments" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-xs text-white" />
+                            <div class="flex flex-col gap-1.5">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Comments</span>
+                                <input @bind="comments" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors" />
                             </div>
-                            <div class="flex flex-col gap-1">
-                                <span class="text-xs font-semibold text-slate-400">Time Ago</span>
-                                <input @bind="timeAgo" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-xs text-white" />
+                            <div class="flex flex-col gap-1.5">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Time Ago</span>
+                                <input @bind="timeAgo" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors" />
                             </div>
                         </div>
 
                         <div class="flex items-center gap-2">
-                            <input type="checkbox" id="lightThemeCheckbox" @bind="isLightTheme" class="accent-blue-600" />
-                            <label for="lightThemeCheckbox" class="text-xs text-slate-300 cursor-pointer">Use Light Theme</label>
+                            <input type="checkbox" id="lightThemeCheckbox" @bind="isLightTheme" class="accent-black dark:accent-white cursor-pointer" />
+                            <label for="lightThemeCheckbox" class="text-xs font-medium text-neutral-700 dark:text-neutral-300 cursor-pointer select-none">Use Light Theme</label>
                         </div>
 
-                        <button @onclick="GetTitleCard" class="bg-green-600 hover:bg-green-700 text-white text-sm font-semibold w-full py-2.5 rounded">
+                        <button @onclick="GetTitleCard" class="bg-neutral-950 dark:bg-white hover:bg-neutral-900 dark:hover:bg-neutral-100 text-white dark:text-black text-sm font-semibold w-full py-2.5 rounded transition-colors">
                             Generate Card
                         </button>
                     </div>
@@ -77,18 +79,18 @@
             </div>
 
             <!-- Preview -->
-            <div class="flex flex-col items-center justify-center border border-slate-800 rounded bg-slate-950/20 p-4 min-h-[400px]">
+            <div class="flex flex-col items-center justify-center border border-neutral-200 dark:border-neutral-800 rounded bg-neutral-50 dark:bg-neutral-950 p-4 min-h-[400px]">
                 @if (cardImageBase64 is not null)
                 {
-                    <img src="@cardImageBase64" class="max-w-full max-h-[500px] rounded shadow-lg" alt="Preview" />
-                    <span class="mt-4 text-xs text-slate-500">
+                    <img src="@cardImageBase64" class="max-w-full max-h-[500px] rounded border border-neutral-200 dark:border-neutral-800" alt="Preview" />
+                    <span class="mt-4 text-xs text-neutral-500 dark:text-neutral-400">
                         Saved: <code>/Volumes/realme/Dev/content-farm/reddit/ballers.png</code>
                     </span>
                 }
                 else
                 {
-                    <div class="text-slate-600 text-center">
-                        <p class="text-sm">Preview will appear here after generation</p>
+                    <div class="text-neutral-400 dark:text-neutral-500 text-center text-sm">
+                        Preview will appear here after generation
                     </div>
                 }
             </div>
