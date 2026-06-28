@@ -1,4 +1,3 @@
-using System.Drawing;
 using HtmlAgilityPack;
 using SkiaSharp;
 
@@ -137,19 +136,20 @@ public class RedditService(IHttpClientFactory clientFactory)
             StrokeJoin = SKStrokeJoin.Round
         };
         
-        using var path = new SKPath();
         float w = size * 0.8f;
         float h = size * 0.9f;
+
+        using var builder = new SKPathBuilder();
+        builder.MoveTo(new SKPoint(x, y - h / 2));
+        builder.LineTo(new SKPoint(x - w / 2, y - h / 2 + w / 2));
+        builder.LineTo(new SKPoint(x - w / 4, y - h / 2 + w / 2));
+        builder.LineTo(new SKPoint(x - w / 4, y + h / 2));
+        builder.LineTo(new SKPoint(x + w / 4, y + h / 2));
+        builder.LineTo(new SKPoint(x + w / 4, y - h / 2 + w / 2));
+        builder.LineTo(new SKPoint(x + w / 2, y - h / 2 + w / 2));
+        builder.Close();
         
-        path.MoveTo(x, y - h/2);
-        path.LineTo(x - w/2, y - h/2 + w/2);
-        path.LineTo(x - w/4, y - h/2 + w/2);
-        path.LineTo(x - w/4, y + h/2);
-        path.LineTo(x + w/4, y + h/2);
-        path.LineTo(x + w/4, y - h/2 + w/2);
-        path.LineTo(x + w/2, y - h/2 + w/2);
-        path.Close();
-        
+        using var path = builder.Detach();
         canvas.DrawPath(path, paint);
     }
 
@@ -165,19 +165,20 @@ public class RedditService(IHttpClientFactory clientFactory)
             StrokeJoin = SKStrokeJoin.Round
         };
         
-        using var path = new SKPath();
         float w = size * 0.8f;
         float h = size * 0.9f;
+
+        using var builder = new SKPathBuilder();
+        builder.MoveTo(new SKPoint(x, y + h / 2));
+        builder.LineTo(new SKPoint(x - w / 2, y + h / 2 - w / 2));
+        builder.LineTo(new SKPoint(x - w / 4, y + h / 2 - w / 2));
+        builder.LineTo(new SKPoint(x - w / 4, y - h / 2));
+        builder.LineTo(new SKPoint(x + w / 4, y - h / 2));
+        builder.LineTo(new SKPoint(x + w / 4, y + h / 2 - w / 2));
+        builder.LineTo(new SKPoint(x + w / 2, y + h / 2 - w / 2));
+        builder.Close();
         
-        path.MoveTo(x, y + h/2);
-        path.LineTo(x - w/2, y + h/2 - w/2);
-        path.LineTo(x - w/4, y + h/2 - w/2);
-        path.LineTo(x - w/4, y - h/2);
-        path.LineTo(x + w/4, y - h/2);
-        path.LineTo(x + w/4, y + h/2 - w/2);
-        path.LineTo(x + w/2, y + h/2 - w/2);
-        path.Close();
-        
+        using var path = builder.Detach();
         canvas.DrawPath(path, paint);
     }
 
@@ -193,19 +194,20 @@ public class RedditService(IHttpClientFactory clientFactory)
             StrokeJoin = SKStrokeJoin.Round
         };
         
-        using var path = new SKPath();
         float w = size * 0.55f; 
         float h = size * 0.45f; 
         float r = size * 0.25f; 
+
+        using var builder = new SKPathBuilder();
+        builder.ArcTo(new SKRect(x - w, y - h, x - w + 2 * r, y - h + 2 * r), 180, 90, false);
+        builder.ArcTo(new SKRect(x + w - 2 * r, y - h, x + w, y - h + 2 * r), 270, 90, false);
+        builder.ArcTo(new SKRect(x + w - 2 * r, y + h - 2 * r, x + w, y + h), 0, 90, false);
+        builder.LineTo(new SKPoint(x - w + 2 * r, y + h));
+        builder.LineTo(new SKPoint(x - w - size * 0.15f, y + h + size * 0.15f));
+        builder.LineTo(new SKPoint(x - w, y + h - r));
+        builder.Close();
         
-        path.ArcTo(new SKRect(x - w, y - h, x - w + 2*r, y - h + 2*r), 180, 90, false);
-        path.ArcTo(new SKRect(x + w - 2*r, y - h, x + w, y - h + 2*r), 270, 90, false);
-        path.ArcTo(new SKRect(x + w - 2*r, y + h - 2*r, x + w, y + h), 0, 90, false);
-        path.LineTo(x - w + 2*r, y + h);
-        path.LineTo(x - w - size * 0.15f, y + h + size * 0.15f);
-        path.LineTo(x - w, y + h - r);
-        path.Close();
-        
+        using var path = builder.Detach();
         canvas.DrawPath(path, paint);
     }
 
@@ -387,8 +389,9 @@ public class RedditService(IHttpClientFactory clientFactory)
         float iconSize = 50;
         var iconRect = new SKRect(leftX, topY, leftX + iconSize, topY + iconSize);
         canvas.Save();
-        using var clipPath = new SKPath();
-        clipPath.AddCircle(leftX + iconSize / 2, topY + iconSize / 2, iconSize / 2);
+        using var clipBuilder = new SKPathBuilder();
+        clipBuilder.AddCircle(leftX + iconSize / 2, topY + iconSize / 2, iconSize / 2, SKPathDirection.Clockwise);
+        using var clipPath = clipBuilder.Detach();
         canvas.ClipPath(clipPath, SkiaSharp.SKClipOperation.Intersect, true);
 
         SKBitmap? iconBitmap = null;
@@ -417,7 +420,7 @@ public class RedditService(IHttpClientFactory clientFactory)
 
         if (iconBitmap != null)
         {
-            canvas.DrawBitmap(iconBitmap, iconRect, new SKPaint { IsAntialias = true });
+            canvas.DrawBitmap(iconBitmap, iconRect, new SKSamplingOptions(SKFilterMode.Linear), new SKPaint { IsAntialias = true });
             iconBitmap.Dispose();
         }
         else
