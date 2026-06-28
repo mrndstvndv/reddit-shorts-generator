@@ -1,8 +1,10 @@
+using System.Drawing;
 using HtmlAgilityPack;
+using SkiaSharp;
 
 namespace BlazorApp1.Services;
 
-public record PostData(string Title, string Text);
+public record PostData(string Title, string Body);
 
 public class RedditException(string message, Exception? inner = null)
     : Exception(message, inner);
@@ -97,5 +99,97 @@ public class RedditService(IHttpClientFactory clientFactory)
         }
 
         return new UriBuilder(uri) { Host = "old.reddit.com" }.Uri.ToString();
+    }
+
+    public async Task GenerateTitleCard(string title)
+    {
+        int w = 1080, h = 1920;
+        using var bitmap = new SKBitmap(w, h);
+        using var canvas = new SKCanvas(bitmap);
+        canvas.Clear(SKColors.Transparent);
+
+        // Card dimensions — centered on a 1080x1920 canvas
+        float cardW = 920, cardH = 600;
+        float cardX = (w - cardW) / 2;
+        float cardY = (h - cardH) / 2;
+        float cornerRadius = 20;
+        float padding = 40;
+
+        var bgPaint = new SKPaint
+        {
+            Color = new SKColor(26, 26, 27, 240),
+            IsAntialias = true,
+            Style = SKPaintStyle.Fill,
+        };
+        
+        canvas.DrawRoundRect(cardX, cardY, cardW, cardH, cornerRadius, cornerRadius, bgPaint);
+
+        var typeface = SKTypeface.Default;
+        var font = new SKFont(typeface, 38);
+        var textPaint = new SKPaint
+        {
+            Color = SKColors.White,
+            IsAntialias = true,
+        };
+
+        var wrappedLines = WrapText(title, (int)(cardW - padding * 2), font);
+        if (wrappedLines.Count == 0) wrappedLines.Add("");
+
+        // Total text block height
+        float lineHeight = 50;
+        float textBlockHeight = wrappedLines.Count * lineHeight;
+
+        // Vertically center the text block within the card
+        float startY = cardY + (cardH - textBlockHeight) / 2 + lineHeight * 0.8f;
+
+        foreach (var line in wrappedLines)
+        {
+            // Horizontally center each line within the card
+            canvas.DrawText(line, cardX + cardW / 2, startY, SKTextAlign.Center, font, textPaint);
+            startY += lineHeight;
+        }
+        
+        using var image = SKImage.FromBitmap(bitmap);
+        var data = image.Encode(SKEncodedImageFormat.Png, 100);
+        await File.WriteAllBytesAsync("/Volumes/realme/Dev/content-farm/reddit/ballers.png", data.ToArray());
+    }
+
+    private static List<string> WrapText(string text, int maxWidth, SKFont font)
+    {
+        var words = text.Split(' ');
+        var lines = new List<string>();
+        var currentLine = new List<string>();
+
+        foreach (var word in words)
+        {
+            var testLine = currentLine.Count == 0
+                ? word
+                : string.Join(" ", currentLine.Append(word));
+
+            float width = font.MeasureText(testLine);
+
+            if (width <= maxWidth)
+            {
+                currentLine.Add(word);
+            }
+            else
+            {
+                if (currentLine.Count > 0)
+                {
+                    lines.Add(string.Join(" ", currentLine));
+                    currentLine = new List<string> { word };
+                }
+                else
+                {
+                    // Single word wider than maxWidth — add it anyway
+                    lines.Add(word);
+                }
+            }
+        }
+
+        if (currentLine.Count > 0)
+            lines.Add(string.Join(" ", currentLine));
+
+        return lines;
     }
 }

@@ -3,41 +3,38 @@
 @using BlazorApp1.Services
 @inject RedditService Reddit
 
-<input @bind="url" placeholder="Paste a Reddit post URL" class="form-control mb-2 border" />
-<button @onclick="GetPost" class="border">run</button>
+<div class="min-h-screen flex flex-col items-center justify-center px-4">
+    <div class="w-full max-w-xl">
+        <input @bind="url" placeholder="Paste a Reddit post URL" class="form-control mb-2 border w-full" />
+        <button @onclick="GetPost" class="border w-full">run</button>
 
-@if (error is not null)
-{
-    <p class="text-danger">@error</p>
-}
+        @if (error is not null)
+        {
+            <p class="text-danger">@error</p>
+        }
 
-@if (title is not null)
-{
-    <h2>@title</h2>
-}
+        @if (post is not null)
+        {
+            <h2>@post.Title</h2>
+            <div>@post.Body</div>
 
-@if (body is not null)
-{
-    <div>@body</div>
-}
+            <button @onclick="GetTitleCard" class="border">Generate Title Card</button>
+        }
+    </div>
+</div>
 
 @code {
     string url = "https://www.reddit.com/r/buhaydigital/comments/1uf64ez/wfh_things_that_make_me_feel_rich_for_no_reason/";
     string? error;
-    string? title;
-    string? body;
+    PostData? post;
 
     public async Task GetPost()
     {
         error = null;
-        title = null;
-        body = null;
 
         try
         {
-            var post = await Reddit.GetPost(url);
-            title = post.Title;
-            body = post.Text;
+            post = await Reddit.GetPost(url);
         }
         catch (RedditFetchException ex)
         {
@@ -47,5 +44,10 @@
         {
             error = ex.Message;
         }
+    }
+
+    public async Task GetTitleCard()
+    {
+        Reddit.GenerateTitleCard(post.Title);
     }
 }
