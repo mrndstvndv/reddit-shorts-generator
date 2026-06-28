@@ -14,7 +14,7 @@ public class RedditPostNotFoundException(string url, string reason)
 public class RedditFetchException(string url, string reason, Exception inner)
     : RedditException($"Failed to fetch {url}: {reason}", inner);
 
-public class RedditService(IHttpClientFactory clientFactory)
+public class RedditService(IHttpClientFactory clientFactory, ILogger<RedditService> logger)
 {
     private static readonly string UserAgent =
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
@@ -103,7 +103,7 @@ public class RedditService(IHttpClientFactory clientFactory)
         return new UriBuilder(uri) { Host = "old.reddit.com" }.Uri.ToString();
     }
 
-    private static SKTypeface GetTypeface(bool bold)
+    private SKTypeface GetTypeface(bool bold)
     {
         var weight = bold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal;
         var style = new SKFontStyle(weight, SKFontStyleWidth.Normal, SKFontStyleSlant.Upright);
@@ -119,7 +119,10 @@ public class RedditService(IHttpClientFactory clientFactory)
                     return tf;
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to load typeface '{FontFamily}'", family);
+            }
         }
         return SKTypeface.Default;
     }
@@ -211,7 +214,7 @@ public class RedditService(IHttpClientFactory clientFactory)
         canvas.DrawPath(path, paint);
     }
 
-    private static SKTypeface GetEmojiTypeface()
+    private SKTypeface GetEmojiTypeface()
     {
         string[] emojiFonts = { "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji" };
         foreach (var family in emojiFonts)
@@ -224,7 +227,10 @@ public class RedditService(IHttpClientFactory clientFactory)
                     return tf;
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to load emoji font '{FontFamily}'", family);
+            }
         }
         return SKTypeface.Default;
     }
