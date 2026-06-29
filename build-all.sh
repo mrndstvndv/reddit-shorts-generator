@@ -7,7 +7,7 @@ RIDS=("win-x64" "osx-x64" "linux-x64" "linux-arm64")
 
 for rid in "${RIDS[@]}"; do
     echo "=== Building $rid ==="
-    dotnet publish -c Release -r "$rid" \
+    dotnet publish BlazorApp1/BlazorApp1.csproj -c Release -r "$rid" \
         --self-contained true \
         -p:PublishSingleFile=true \
         -o "dist/$rid"
