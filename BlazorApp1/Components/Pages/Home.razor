@@ -1,156 +1,232 @@
 @page "/"
 @rendermode InteractiveServer
 
-<div class="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-neutral-200 p-6 flex flex-col items-center justify-center transition-colors duration-300">
-    <div class="w-full max-w-4xl border border-neutral-200 dark:border-neutral-800 rounded-lg p-6 bg-white dark:bg-black">
-        <header class="mb-8 text-center">
-            <h1 class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">Reddit Short Generator</h1>
-            <p class="text-neutral-500 dark:text-neutral-400 text-sm mt-1">Generate Reddit short videos with AI voices</p>
+<div class="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-neutral-200 p-4 md:p-8 flex flex-col items-center transition-colors duration-300">
+    <div class="w-full max-w-7xl border border-neutral-200 dark:border-neutral-800 rounded-lg p-6 bg-white dark:bg-black shadow-sm">
+        <header class="mb-8 border-b border-neutral-100 dark:border-neutral-900 pb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white font-mono">REDDIT SHORT GENERATOR</h1>
+                <p class="text-neutral-500 dark:text-neutral-400 text-xs mt-1 font-mono uppercase tracking-wider">Automated Content Engine</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="lightThemeCheckbox" @bind="isLightTheme" class="accent-black dark:accent-white cursor-pointer" />
+                    <label for="lightThemeCheckbox" class="text-xs font-semibold text-neutral-700 dark:text-neutral-300 cursor-pointer select-none font-mono uppercase">Use Light Theme</label>
+                </div>
+            </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Left panel: Form Controls -->
-            <div class="space-y-4">
+            <div class="lg:col-span-7 space-y-6">
                 <div class="flex flex-col gap-1.5">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Post URL</span>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-mono">1. Fetch Content</span>
                     <div class="flex gap-2">
-                        <input @bind="url" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors" placeholder="https://www.reddit.com/r/..." />
-                        <button @onclick="GetPost" class="bg-neutral-950 dark:bg-white hover:bg-neutral-900 dark:hover:bg-neutral-100 text-white dark:text-black text-sm font-medium px-4 py-2 rounded transition-colors whitespace-nowrap">Fetch</button>
+                        <input @bind="url" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors font-mono" placeholder="https://www.reddit.com/r/..." />
+                        <button @onclick="GetPost" class="bg-neutral-950 dark:bg-white hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black border border-neutral-950 dark:border-white text-xs font-bold font-mono px-6 py-2 rounded transition-colors uppercase tracking-wider">Fetch</button>
                     </div>
                 </div>
 
-
-
                 @if (post is not null)
                 {
-                    <div class="border-t border-neutral-200 dark:border-neutral-800 pt-4 space-y-4">
+                    <div class="border-t border-neutral-200 dark:border-neutral-800 pt-6 space-y-5">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-mono block">2. Edit Metadata & Script</span>
+                        
                         <div class="flex flex-col gap-1.5">
-                            <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Title</span>
-                            <textarea @bind="postTitle" rows="3" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors resize-y"></textarea>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono">Title Text</span>
+                            <textarea @bind="postTitle" rows="2" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors resize-y font-mono" placeholder="Video Title Card Text"></textarea>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="flex flex-col gap-1.5">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Subreddit</span>
-                                <input @bind="subredditName" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors" />
-                            </div>
-                            <div class="flex flex-col gap-1.5">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Icon Path</span>
-                                <input @bind="subredditIconPath" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors" placeholder="URL/Path" />
-                            </div>
-                            <div class="flex flex-col gap-1.5">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Author</span>
-                                <input @bind="username" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors" />
-                            </div>
+                        <div class="flex flex-col gap-1.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono">Post Body Text (Spoken Script)</span>
+                            <textarea @bind="postBody" rows="6" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors resize-y font-mono" placeholder="Video main content..."></textarea>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-3">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="flex flex-col gap-1.5">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Votes</span>
-                                <input @bind="votes" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors" />
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono">Subreddit</span>
+                                <input @bind="subredditName" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors font-mono" />
                             </div>
                             <div class="flex flex-col gap-1.5">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Comments</span>
-                                <input @bind="comments" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors" />
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono">Icon Path/URL</span>
+                                <input @bind="subredditIconPath" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors font-mono" placeholder="Optional URL/Path" />
                             </div>
                             <div class="flex flex-col gap-1.5">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Time Ago</span>
-                                <input @bind="timeAgo" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors" />
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono">Author</span>
+                                <input @bind="username" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors font-mono" />
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-2">
-                            <input type="checkbox" id="lightThemeCheckbox" @bind="isLightTheme" class="accent-black dark:accent-white cursor-pointer" />
-                            <label for="lightThemeCheckbox" class="text-xs font-medium text-neutral-700 dark:text-neutral-300 cursor-pointer select-none">Use Light Theme</label>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="flex flex-col gap-1.5">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono">Votes</span>
+                                <input @bind="votes" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors font-mono" />
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono">Comments</span>
+                                <input @bind="comments" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors font-mono" />
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono">Time Ago</span>
+                                <input @bind="timeAgo" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none transition-colors font-mono" />
+                            </div>
                         </div>
 
-                        <button @onclick="GetVideo" disabled="@(state != GenState.Idle && state != GenState.Complete && state.ErrorMessage is null)" class="bg-neutral-950 dark:bg-white hover:bg-neutral-900 dark:hover:bg-neutral-100 text-white dark:text-black text-sm font-semibold w-full py-2.5 rounded transition-colors disabled:opacity-40 disabled:pointer-events-none">
-                            @GetButtonLabel()
-                        </button>
+                        <div class="flex flex-col gap-2 border-t border-neutral-200 dark:border-neutral-800 pt-4">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-mono">3. Assets & Style Settings</span>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                                <!-- Subtitles Font Selection & Upload -->
+                                <div class="space-y-2 border border-neutral-200 dark:border-neutral-800 rounded p-3 bg-neutral-50 dark:bg-neutral-950">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono block">Subtitles Font</span>
+                                    <select @bind="selectedFont" class="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white rounded px-3 py-1.5 text-xs text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors font-mono">
+                                        <option value="Arial">Arial (System Default)</option>
+                                        @foreach (var font in availableFonts)
+                                        {
+                                            <option value="@font">@font</option>
+                                        }
+                                    </select>
+                                    <label class="cursor-pointer block bg-neutral-950 hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black border border-neutral-950 dark:border-white px-3 py-1.5 rounded text-[10px] font-bold text-center transition-colors uppercase tracking-wider font-mono">
+                                        Upload Font (.ttf/.otf)
+                                        <InputFile OnChange="OnFontFileChange" class="hidden" accept=".ttf,.otf" />
+                                    </label>
+                                    @if (isUploadingFont)
+                                    {
+                                        <span class="text-[10px] text-neutral-500 animate-pulse block text-center font-mono">Uploading Font...</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(fontUploadError))
+                                    {
+                                        <span class="text-[10px] text-red-500 block text-center font-mono">@fontUploadError</span>
+                                    }
+                                </div>
+
+                                <!-- Background Gameplay Selection & Upload -->
+                                <div class="space-y-2 border border-neutral-200 dark:border-neutral-800 rounded p-3 bg-neutral-50 dark:bg-neutral-950">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono block">Gameplay Video</span>
+                                    <select @bind="selectedGameplay" class="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white rounded px-3 py-1.5 text-xs text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors font-mono">
+                                        @if (availableGameplays.Count == 0)
+                                        {
+                                            <option value="">No videos. Please upload.</option>
+                                        }
+                                        @foreach (var vid in availableGameplays)
+                                        {
+                                            <option value="@vid">@vid</option>
+                                        }
+                                    </select>
+                                    <label class="cursor-pointer block bg-neutral-950 hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black border border-neutral-950 dark:border-white px-3 py-1.5 rounded text-[10px] font-bold text-center transition-colors uppercase tracking-wider font-mono">
+                                        Upload Gameplay Video
+                                        <InputFile OnChange="OnGameplayFileChange" class="hidden" accept=".mp4,.mov,.mkv,.avi" />
+                                    </label>
+                                    @if (isUploadingGameplay)
+                                    {
+                                        <span class="text-[10px] text-neutral-500 animate-pulse block text-center font-mono">Uploading Video...</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(gameplayUploadError))
+                                    {
+                                        <span class="text-[10px] text-red-500 block text-center font-mono">@gameplayUploadError</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 }
             </div>
 
-            <!-- Preview / Status -->
-            <div class="flex flex-col items-center justify-center border border-neutral-200 dark:border-neutral-800 rounded bg-neutral-50 dark:bg-neutral-950 p-4 min-h-[400px]">
-                @if (state.ErrorMessage is not null)
-                {
-                    <div class="text-red-500 dark:text-red-400 text-center text-sm">
-                        <span class="block text-lg mb-1">⚠</span>
-                        @state.ErrorMessage
-                    </div>
-                }
-                else if (state == GenState.Idle)
-                {
-                    <div class="text-neutral-400 dark:text-neutral-500 text-center text-sm">
-                        Preview will appear here after generation
-                    </div>
-                }
-                else if (state == GenState.Fetching)
-                {
-                    <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400">
-                        <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        <span class="text-sm">Fetching Reddit post...</span>
-                    </div>
-                }
-                else if (state == GenState.GeneratingTitleCard)
-                {
-                    <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400">
-                        <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        <span class="text-sm">Generating title card...</span>
-                    </div>
-                }
-                else if (state == GenState.SynthesizingTitleVoice)
-                {
-                    <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400">
-                        <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        <span class="text-sm">Synthesizing title voice...</span>
-                    </div>
-                }
-                else if (state == GenState.SynthesizingBodyVoice)
-                {
-                    <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400">
-                        <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        <span class="text-sm">Synthesizing body voice...</span>
-                    </div>
-                }
-                else if (state == GenState.GeneratingVideo)
-                {
-                    <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400">
-                        <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        <span class="text-sm">Generating video with FFmpeg...</span>
-                    </div>
-                }
-                else if (state == GenState.Complete && identifier != null)
-                {
-                    <div class="flex flex-col items-center gap-2 text-center w-full">
-                        <video controls class="w-full max-h-[500px] rounded" preload="metadata">
-                            <source src="/outputs/@identifier/@(identifier).mp4" type="video/mp4" />
-                        </video>
-                        <a href="/outputs/@identifier/@(identifier).mp4" download="@(identifier).mp4" class="bg-neutral-950 dark:bg-white hover:bg-neutral-900 dark:hover:bg-neutral-100 text-white dark:text-black text-sm font-semibold px-6 py-2 rounded transition-colors inline-flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            Download
-                        </a>
-                    </div>
-                }
+            <!-- Right panel: Preview / Status -->
+            <div class="lg:col-span-5 flex flex-col justify-start">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-mono">Render Monitor</span>
+                    @if (post is not null)
+                    {
+                        <button @onclick="GetVideo" disabled="@(state != GenState.Idle && state != GenState.Complete && state.ErrorMessage is null)" class="bg-neutral-950 dark:bg-white hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black text-[10px] font-bold font-mono px-4 py-1.5 rounded transition-colors disabled:opacity-40 disabled:pointer-events-none uppercase tracking-widest border border-neutral-950 dark:border-white whitespace-nowrap">
+                            @GetButtonLabel()
+                        </button>
+                    }
+                </div>
+                <div class="flex flex-col items-center justify-center border border-neutral-200 dark:border-neutral-800 rounded bg-neutral-50 dark:bg-neutral-950 p-4 min-h-[500px] sticky top-8">
+                    @if (state.ErrorMessage is not null)
+                    {
+                        <div class="text-red-500 dark:text-red-400 text-center text-xs font-mono p-4 w-full">
+                            <span class="block text-sm mb-2 font-bold">⚠ ERROR</span>
+                            <div class="border border-red-500/20 bg-red-500/5 p-3 rounded text-left overflow-auto max-h-[350px] text-[11px] font-mono">
+                                @state.ErrorMessage
+                            </div>
+                        </div>
+                    }
+                    else if (state == GenState.Idle)
+                    {
+                        <div class="text-neutral-400 dark:text-neutral-500 text-center text-xs font-mono uppercase tracking-wider">
+                            Waiting for command sequence...
+                        </div>
+                    }
+                    else if (state == GenState.Fetching)
+                    {
+                        <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
+                            <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            <span class="text-xs uppercase tracking-wider">[FETCHING REDDIT CONTENT]</span>
+                        </div>
+                    }
+                    else if (state == GenState.GeneratingTitleCard)
+                    {
+                        <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
+                            <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            <span class="text-xs uppercase tracking-wider">[GENERATING TITLE CARD PNG]</span>
+                        </div>
+                    }
+                    else if (state == GenState.SynthesizingTitleVoice)
+                    {
+                        <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
+                            <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            <span class="text-xs uppercase tracking-wider">[SYNTHESIZING TITLE TTS AUDIO]</span>
+                        </div>
+                    }
+                    else if (state == GenState.SynthesizingBodyVoice)
+                    {
+                        <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
+                            <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            <span class="text-xs uppercase tracking-wider">[SYNTHESIZING BODY TTS AUDIO]</span>
+                        </div>
+                    }
+                    else if (state == GenState.GeneratingVideo)
+                    {
+                        <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
+                            <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            <span class="text-xs uppercase tracking-wider">[FFMPEG COMPOSITING ENGINE ACTIVE]</span>
+                        </div>
+                    }
+                    else if (state == GenState.Complete && identifier != null)
+                    {
+                        <div class="flex flex-col items-center gap-4 text-center w-full">
+                            <div class="w-full flex justify-between items-center px-1 font-mono text-[10px] text-neutral-500 uppercase">
+                                <span>Output: @(identifier).mp4</span>
+                                <span>Status: RENDERED</span>
+                            </div>
+                            <video controls class="w-full max-h-[550px] rounded border border-neutral-200 dark:border-neutral-800" preload="metadata">
+                                <source src="/outputs/@identifier/@(identifier).mp4" type="video/mp4" />
+                            </video>
+                            <a href="/outputs/@identifier/@(identifier).mp4" download="@(identifier).mp4" class="bg-neutral-950 dark:bg-white hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black text-xs font-bold font-mono px-6 py-3 rounded transition-colors inline-flex items-center gap-2 uppercase tracking-widest border border-neutral-950 dark:border-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Download Render
+                            </a>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-

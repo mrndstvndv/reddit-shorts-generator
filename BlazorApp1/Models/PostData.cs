@@ -1,6 +1,6 @@
 namespace BlazorApp1.Models;
 
-public record PostData(string Title, string Body, string Author, string OldUrl);
+public record PostData(string Title, string Body, string Author, string OldUrl, string Votes, string Comments, string TimeAgo);
 
 public class RedditException(string message, Exception? inner = null)
     : Exception(message, inner);

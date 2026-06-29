@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;700&display=swap');
+
 @source "../**/*.razor";
 @source "../**/*.razor.css";
 @source "../**/*.html";
+
+@theme {
+  --font-sans: "Geist Mono", monospace;
+  --font-mono: "Geist Mono", monospace;
+}
+
+html, body, button, input, textarea, select {
+  font-family: "Geist Mono", monospace !important;
+}

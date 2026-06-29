@@ -1,5 +1,6 @@
 using BlazorApp1.Services;
 using SkiaSharp;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace BlazorApp1.IntegrationTests;
 
@@ -10,10 +11,10 @@ namespace BlazorApp1.IntegrationTests;
 /// </summary>
 public class RedditTitleCardTests
 {
-    private static RedditService CreateService()
+    private static RedditCardService CreateService()
     {
         var factory = new MinimalHttpClientFactory();
-        return new RedditService(factory);
+        return new RedditCardService(factory, NullLogger<RedditCardService>.Instance);
     }
 
     /// <summary>
