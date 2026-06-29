@@ -4,8 +4,8 @@
 <div class="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-neutral-200 p-6 flex flex-col items-center justify-center transition-colors duration-300">
     <div class="w-full max-w-4xl border border-neutral-200 dark:border-neutral-800 rounded-lg p-6 bg-white dark:bg-black">
         <header class="mb-8 text-center">
-            <h1 class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">Reddit Title Card Generator</h1>
-            <p class="text-neutral-500 dark:text-neutral-400 text-sm mt-1">Replicate official Reddit style posts as stunning images</p>
+            <h1 class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">Reddit Short Generator</h1>
+            <p class="text-neutral-500 dark:text-neutral-400 text-sm mt-1">Generate Reddit short videos with AI voices</p>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -139,12 +139,13 @@
                 else if (state == GenState.Complete && identifier != null)
                 {
                     <div class="flex flex-col items-center gap-2 text-center w-full">
-                        <span class="text-green-500 dark:text-green-400 text-2xl">✓</span>
-                        <span class="text-sm text-neutral-700 dark:text-neutral-300 font-medium">Video generated!</span>
-                        <span class="text-xs text-neutral-400 dark:text-neutral-500">@identifier</span>
-                        <video controls class="w-full max-h-[500px] rounded mt-2" preload="metadata">
-                            <source src="/outputs/@identifier/final.mp4" type="video/mp4" />
+                        <video controls class="w-full max-h-[500px] rounded" preload="metadata">
+                            <source src="/outputs/@identifier/@(identifier).mp4" type="video/mp4" />
                         </video>
+                        <a href="/outputs/@identifier/@(identifier).mp4" download="@(identifier).mp4" class="bg-neutral-950 dark:bg-white hover:bg-neutral-900 dark:hover:bg-neutral-100 text-white dark:text-black text-sm font-semibold px-6 py-2 rounded transition-colors inline-flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Download
+                        </a>
                     </div>
                 }
             </div>

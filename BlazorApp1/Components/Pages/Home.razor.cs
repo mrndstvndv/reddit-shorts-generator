@@ -165,7 +165,7 @@ public partial class Home
                 BodyAudioPath = Path.Combine(dir, "body-voice.mp3"),
                 TitleImagePath = Path.Combine(dir, "title-card.png"),
                 SubtitlePath = Path.Combine(dir, "subs.ass"),
-                OutputPath = Path.Combine(dir, "final.mp4"),
+                OutputPath = Path.Combine(dir, $"{identifier}.mp4"),
                 TitleDurationSec = titleDuration
             });
 
