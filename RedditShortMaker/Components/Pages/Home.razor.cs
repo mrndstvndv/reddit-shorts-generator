@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.JSInterop;
 using RedditShortMaker.Models;
 using RedditShortMaker.Services;
@@ -26,6 +27,9 @@ public partial class Home
 
     [Inject]
     private IJSRuntime JS { get; set; } = null!;
+
+    [Inject]
+    private IWebHostEnvironment Env { get; set; } = null!;
 
     public readonly record struct GenState
     {
@@ -390,7 +394,7 @@ public partial class Home
             );
 
             identifier = new Uri(post.OldUrl).AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries)[^1];
-            var dir = $"./outputs/{identifier}";
+            var dir = Path.Combine(Env.ContentRootPath, "outputs", identifier);
             Directory.CreateDirectory(dir);
             await File.WriteAllBytesAsync(Path.Combine(dir, "title-card.png"), titleCard);
 
@@ -473,7 +477,7 @@ public partial class Home
         }
         catch (Exception ex)
         {
-            state = GenState.Error($"Failed to generate video: {ex.Message}");
+            state = GenState.Error($"Failed to generate video: {ex.Message}\n\nDetails:\n{ex}");
         }
     }
 }

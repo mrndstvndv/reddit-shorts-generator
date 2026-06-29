@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 
 # Prerequisites: .NET 10 SDK, ffmpeg, Node.js (npm install must have been run)
 
-RIDS=("win-x64" "osx-x64" "linux-x64" "linux-arm64")
+RIDS=("win-x64" "osx-x64" "osx-arm64" "linux-x64" "linux-arm64")
 
 for rid in "${RIDS[@]}"; do
     echo "=== Building $rid ==="

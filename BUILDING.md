@@ -19,6 +19,7 @@ Or build individually:
 ```bash
 dotnet publish -c Release -r win-x64     --self-contained true -p:PublishSingleFile=true -o dist/win-x64
 dotnet publish -c Release -r osx-x64     --self-contained true -p:PublishSingleFile=true -o dist/osx-x64
+dotnet publish -c Release -r osx-arm64   --self-contained true -p:PublishSingleFile=true -o dist/osx-arm64
 dotnet publish -c Release -r linux-x64   --self-contained true -p:PublishSingleFile=true -o dist/linux-x64
 dotnet publish -c Release -r linux-arm64 --self-contained true -p:PublishSingleFile=true -o dist/linux-arm64
 ```
@@ -78,4 +79,5 @@ dist/<rid>/
 
 - **Build output location matters.** When publishing for multiple RIDs, use separate output directories **outside** the project folder (e.g., `dist/<rid>/`). If you publish inside the project tree (like `publish/`), the Blazor build system may scan previous RID outputs and fail with `BLAZOR106`.
 - **Clean between RIDs** if reusing the same output directory — `bin/` and `obj/` cache per-RID builds correctly, but publish outputs should be isolated.
-- The project uses SkiaSharp which has native platform dependencies — the self-contained publish handles these automatically for each target.
+- The project uses SkiaSharp which has native platform dependencies (like `libSkiaSharp.dylib` / `libSkiaSharp.dll`). Because we publish to a single-file executable, we configure `<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>` in `RedditShortMaker.csproj` to bundle these native libraries inside the binary, allowing them to extract and load automatically at runtime.
+- **Rosetta 2 vs Native:** If you run the `osx-x64` binary on an Apple Silicon (M1/M2/M3) Mac, it will run via Rosetta translation. For optimal performance and native compatibility, use the `osx-arm64` binary build instead.
