@@ -1,6 +1,6 @@
-using BlazorApp1.Components;
-using BlazorApp1.Models;
-using BlazorApp1.Services;
+using RedditShortMaker.Components;
+using RedditShortMaker.Models;
+using RedditShortMaker.Services;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 

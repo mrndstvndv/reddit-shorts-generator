@@ -7,7 +7,7 @@ RIDS=("win-x64" "osx-x64" "linux-x64" "linux-arm64")
 
 for rid in "${RIDS[@]}"; do
     echo "=== Building $rid ==="
-    dotnet publish BlazorApp1/BlazorApp1.csproj -c Release -r "$rid" \
+    dotnet publish RedditShortMaker/RedditShortMaker.csproj -c Release -r "$rid" \
         --self-contained true \
         -p:PublishSingleFile=true \
         -o "dist/$rid"
@@ -15,4 +15,4 @@ for rid in "${RIDS[@]}"; do
 done
 
 echo "=== All builds complete ==="
-ls -lh dist/*/BlazorApp1* 2>/dev/null || true
+ls -lh dist/*/RedditShortMaker* 2>/dev/null || true

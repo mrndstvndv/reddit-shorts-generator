@@ -1,8 +1,8 @@
 using HtmlAgilityPack;
-using BlazorApp1.Models;
+using RedditShortMaker.Models;
 using System.Diagnostics;
 
-namespace BlazorApp1.Services;
+namespace RedditShortMaker.Services;
 
 public class RedditService(IHttpClientFactory clientFactory, ILogger<RedditService> logger)
 {

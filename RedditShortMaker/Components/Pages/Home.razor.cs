@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using BlazorApp1.Models;
-using BlazorApp1.Services;
+using RedditShortMaker.Models;
+using RedditShortMaker.Services;
 
-namespace BlazorApp1.Components.Pages;
+namespace RedditShortMaker.Components.Pages;
 
 public partial class Home
 {

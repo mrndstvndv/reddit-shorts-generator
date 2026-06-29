@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace BlazorApp1.Services;
+namespace RedditShortMaker.Services;
 
 public class FfmpegException(string message, Exception? inner = null)
     : Exception(message, inner);

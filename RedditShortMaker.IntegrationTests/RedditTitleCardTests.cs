@@ -1,8 +1,8 @@
-using BlazorApp1.Services;
+using RedditShortMaker.Services;
 using SkiaSharp;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace BlazorApp1.IntegrationTests;
+namespace RedditShortMaker.IntegrationTests;
 
 /// <summary>
 /// Tests for the Reddit title card generator.

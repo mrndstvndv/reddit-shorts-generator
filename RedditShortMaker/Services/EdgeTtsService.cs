@@ -21,7 +21,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-namespace BlazorApp1.Services;
+namespace RedditShortMaker.Services;
 
 public record WordBoundary(string Text, long OffsetTicks, long DurationTicks)
 {

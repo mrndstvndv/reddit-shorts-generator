@@ -1,7 +1,7 @@
 using SkiaSharp;
 using Microsoft.Extensions.Logging;
 
-namespace BlazorApp1.Services;
+namespace RedditShortMaker.Services;
 
 public class RedditCardService(IHttpClientFactory clientFactory, ILogger<RedditCardService> logger)
 {

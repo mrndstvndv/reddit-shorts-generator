@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using BlazorApp1.Services;
+using RedditShortMaker.Services;
 
-namespace BlazorApp1.Components.Pages;
+namespace RedditShortMaker.Components.Pages;
 
 public partial class EdgeTtsDemo
 {

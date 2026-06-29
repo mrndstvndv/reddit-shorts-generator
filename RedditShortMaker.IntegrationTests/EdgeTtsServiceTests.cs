@@ -1,6 +1,6 @@
-using BlazorApp1.Services;
+using RedditShortMaker.Services;
 
-namespace BlazorApp1.IntegrationTests;
+namespace RedditShortMaker.IntegrationTests;
 
 /// <summary>
 /// Integration tests against the live Microsoft Edge TTS WebSocket API.

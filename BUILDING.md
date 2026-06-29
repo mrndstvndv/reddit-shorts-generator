@@ -53,11 +53,11 @@ Each command produces a single-file self-contained binary with all dependencies 
 
 ```
 dist/<rid>/
-├── BlazorApp1              # or BlazorApp1.exe on Windows
-├── BlazorApp1.pdb          # debug symbols
-├── BlazorApp1.deps.json
-├── BlazorApp1.runtimeconfig.json
-├── BlazorApp1.staticwebassets.endpoints.json
+├── RedditShortMaker              # or RedditShortMaker.exe on Windows
+├── RedditShortMaker.pdb          # debug symbols
+├── RedditShortMaker.deps.json
+├── RedditShortMaker.runtimeconfig.json
+├── RedditShortMaker.staticwebassets.endpoints.json
 ├── appsettings.json
 ├── appsettings.Development.json
 ├── wwwroot/                # static assets
@@ -68,10 +68,10 @@ dist/<rid>/
 
 ```bash
 # Default (http://localhost:5000)
-./dist/linux-x64/BlazorApp1
+./dist/linux-x64/RedditShortMaker
 
 # Custom port / bind address
-./dist/linux-x64/BlazorApp1 --urls "http://0.0.0.0:8080"
+./dist/linux-x64/RedditShortMaker --urls "http://0.0.0.0:8080"
 ```
 
 ## Caveats

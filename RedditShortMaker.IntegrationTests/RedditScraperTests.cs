@@ -1,8 +1,8 @@
-using BlazorApp1.Services;
-using BlazorApp1.Models;
+using RedditShortMaker.Services;
+using RedditShortMaker.Models;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace BlazorApp1.IntegrationTests;
+namespace RedditShortMaker.IntegrationTests;
 
 public class RedditScraperTests
 {

@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BlazorApp1\BlazorApp1.csproj" />
+    <ProjectReference Include="..\RedditShortMaker\RedditShortMaker.csproj" />
   </ItemGroup>
 
 </Project>

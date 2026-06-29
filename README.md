@@ -10,9 +10,9 @@ Built for creators, content farms, and automation engineers who need to scale Re
 
 ## Screenshots
 
-| Loaded post | Generated video |
-|---|---|
-| ![app loaded](screenshots/app-loaded.png) | ![video complete](screenshots/video-complete.png) |
+| Loaded post | Generated video | Sample output |
+|---|---|---|
+| ![app loaded](screenshots/app-loaded.png) | ![video complete](screenshots/video-complete.png) | ![sample output](screenshots/sample-output.jpg) |
 
 ## How automation works
 

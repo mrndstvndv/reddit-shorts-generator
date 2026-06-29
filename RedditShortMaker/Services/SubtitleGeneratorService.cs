@@ -13,7 +13,7 @@
 
 using System.Text;
 
-namespace BlazorApp1.Services;
+namespace RedditShortMaker.Services;
 
 public record AssDialogue(
     int Layer,

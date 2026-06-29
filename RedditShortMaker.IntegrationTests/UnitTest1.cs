@@ -1,4 +1,4 @@
-﻿namespace BlazorApp1.IntegrationTests;
+﻿namespace RedditShortMaker.IntegrationTests;
 
 public class UnitTest1
 {

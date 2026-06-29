@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp1", "BlazorApp1\BlazorApp1.csproj", "{BBD33259-FCC7-439C-9DEF-AD6EEB469500}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedditShortMaker", "RedditShortMaker\RedditShortMaker.csproj", "{BBD33259-FCC7-439C-9DEF-AD6EEB469500}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp1.IntegrationTests", "BlazorApp1.IntegrationTests\BlazorApp1.IntegrationTests.csproj", "{B5E7C4D2-BF15-4375-89B5-0EB1CF929419}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedditShortMaker.IntegrationTests", "RedditShortMaker.IntegrationTests\RedditShortMaker.IntegrationTests.csproj", "{B5E7C4D2-BF15-4375-89B5-0EB1CF929419}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

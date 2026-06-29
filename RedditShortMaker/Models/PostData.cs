@@ -1,4 +1,4 @@
-namespace BlazorApp1.Models;
+namespace RedditShortMaker.Models;
 
 public record PostData(string Title, string Body, string Author, string OldUrl, string Votes, string Comments, string TimeAgo);
 
