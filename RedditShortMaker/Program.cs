@@ -61,10 +61,12 @@ app.UseHttpsRedirection();
 
 app.UseAntiforgery();
 
+var outputsDir = Path.Combine(Directory.GetCurrentDirectory(), "outputs");
+Directory.CreateDirectory(outputsDir);
+
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "outputs")),
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(outputsDir),
     RequestPath = "/outputs",
 });
 app.MapStaticAssets();
