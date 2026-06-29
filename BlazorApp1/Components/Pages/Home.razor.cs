@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using BlazorApp1.Models;
 using BlazorApp1.Services;
 
@@ -21,6 +23,9 @@ public partial class Home
     
     [Inject]
     private FfmpegService Ffmpeg { get; set; } = null!;
+
+    [Inject]
+    private IJSRuntime JS { get; set; } = null!;
 
     public readonly record struct GenState
     {
@@ -44,7 +49,7 @@ public partial class Home
         public static GenState Error(string message) => new(7, message);
     }
 
-    private string url = "https://www.reddit.com/r/buhaydigital/comments/1uf64ez/wfh_things_that_make_me_feel_rich_for_no_reason/";
+    private string url = "";
     private string subredditName = "r/buhaydigital";
     private string subredditIconPath = "";
     private string username = "username";
@@ -52,6 +57,7 @@ public partial class Home
     private string comments = "2.2K";
     private string timeAgo = "2d ago";
     private bool isLightTheme;
+    private string cardThemeSelection = "dark";
     private string? identifier;
     private GenState state = GenState.Idle;
     private PostData? post;
@@ -84,6 +90,46 @@ public partial class Home
             // Ignore
         }
         RefreshFiles();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                var storedFont = await JS.InvokeAsync<string>("localStorage.getItem", "reddit_generator_font");
+                var storedGameplay = await JS.InvokeAsync<string>("localStorage.getItem", "reddit_generator_gameplay");
+                var storedTheme = await JS.InvokeAsync<string>("localStorage.getItem", "reddit_generator_theme");
+
+                var changed = false;
+                if (!string.IsNullOrEmpty(storedFont) && (storedFont == "Arial" || availableFonts.Contains(storedFont)))
+                {
+                    selectedFont = storedFont;
+                    changed = true;
+                }
+                if (!string.IsNullOrEmpty(storedGameplay) && availableGameplays.Contains(storedGameplay))
+                {
+                    selectedGameplay = storedGameplay;
+                    changed = true;
+                }
+                if (!string.IsNullOrEmpty(storedTheme))
+                {
+                    cardThemeSelection = storedTheme;
+                    isLightTheme = (cardThemeSelection == "light");
+                    changed = true;
+                }
+
+                if (changed)
+                {
+                    StateHasChanged();
+                }
+            }
+            catch
+            {
+                // LocalStorage not available or failed during prerendering
+            }
+        }
     }
 
     private void RefreshFiles()
@@ -155,6 +201,7 @@ public partial class Home
 
                 RefreshFiles();
                 selectedFont = file.Name;
+                await SaveFontAsync();
             }
         }
         catch (Exception ex)
@@ -196,6 +243,7 @@ public partial class Home
 
                 RefreshFiles();
                 selectedGameplay = file.Name;
+                await SaveGameplayAsync();
             }
         }
         catch (Exception ex)
@@ -206,6 +254,50 @@ public partial class Home
         {
             isUploadingGameplay = false;
             StateHasChanged();
+        }
+    }
+
+    private async Task SaveFontAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("localStorage.setItem", "reddit_generator_font", selectedFont);
+        }
+        catch
+        {
+            // Ignore
+        }
+    }
+
+    private async Task SaveGameplayAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("localStorage.setItem", "reddit_generator_gameplay", selectedGameplay);
+        }
+        catch
+        {
+            // Ignore
+        }
+    }
+
+    private async Task SaveThemeAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("localStorage.setItem", "reddit_generator_theme", cardThemeSelection);
+        }
+        catch
+        {
+            // Ignore
+        }
+    }
+
+    private async Task HandleUrlKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await GetPost();
         }
     }
 
@@ -280,6 +372,7 @@ public partial class Home
             return;
         }
 
+        isLightTheme = (cardThemeSelection == "light");
         state = GenState.GeneratingTitleCard;
         StateHasChanged();
 
@@ -321,8 +414,31 @@ public partial class Home
             var hasCustomFont = false;
             if (selectedFont != "Arial" && !string.IsNullOrEmpty(selectedFont))
             {
-                selectedFontName = Path.GetFileNameWithoutExtension(selectedFont);
                 hasCustomFont = true;
+                var fontPath = Path.Combine(FontsDir, selectedFont);
+                if (File.Exists(fontPath))
+                {
+                    try
+                    {
+                        using var tf = SkiaSharp.SKTypeface.FromFile(fontPath);
+                        if (tf is not null && !string.IsNullOrEmpty(tf.FamilyName))
+                        {
+                            selectedFontName = tf.FamilyName;
+                        }
+                        else
+                        {
+                            selectedFontName = Path.GetFileNameWithoutExtension(selectedFont);
+                        }
+                    }
+                    catch
+                    {
+                        selectedFontName = Path.GetFileNameWithoutExtension(selectedFont);
+                    }
+                }
+                else
+                {
+                    selectedFontName = Path.GetFileNameWithoutExtension(selectedFont);
+                }
             }
 
             var assStyle = new AssStyle

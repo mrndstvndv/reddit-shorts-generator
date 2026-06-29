@@ -19,6 +19,10 @@ wwwroot/css/app.min.css
 # Generated outputs
 outputs/
 
+# Assets
+fonts/
+vids/
+
 # OS
 .DS_Store
 Thumbs.db

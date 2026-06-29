@@ -2,33 +2,68 @@
 @rendermode InteractiveServer
 
 <div class="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-neutral-200 p-4 md:p-8 flex flex-col items-center transition-colors duration-300">
-    <div class="w-full max-w-7xl border border-neutral-200 dark:border-neutral-800 rounded-lg p-6 bg-white dark:bg-black shadow-sm">
+    <div class="w-full max-w-7xl rounded-lg p-6 bg-white dark:bg-black">
         <header class="mb-8 border-b border-neutral-100 dark:border-neutral-900 pb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
                 <h1 class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white font-mono">REDDIT SHORT GENERATOR</h1>
                 <p class="text-neutral-500 dark:text-neutral-400 text-xs mt-1 font-mono uppercase tracking-wider">Automated Content Engine</p>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" id="lightThemeCheckbox" @bind="isLightTheme" class="accent-black dark:accent-white cursor-pointer" />
-                    <label for="lightThemeCheckbox" class="text-xs font-semibold text-neutral-700 dark:text-neutral-300 cursor-pointer select-none font-mono uppercase">Use Light Theme</label>
-                </div>
-            </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Left panel: Form Controls -->
-            <div class="lg:col-span-7 space-y-6">
-                <div class="flex flex-col gap-1.5">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-mono">1. Fetch Content</span>
-                    <div class="flex gap-2">
-                        <input @bind="url" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors font-mono" placeholder="https://www.reddit.com/r/..." />
-                        <button @onclick="GetPost" class="bg-neutral-950 dark:bg-white hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black border border-neutral-950 dark:border-white text-xs font-bold font-mono px-6 py-2 rounded transition-colors uppercase tracking-wider">Fetch</button>
-                    </div>
+        @if (post is null)
+        {
+            <div class="flex flex-col items-center justify-center py-24 max-w-2xl mx-auto space-y-6">
+                <div class="text-center space-y-2">
+                    <h2 class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white font-mono uppercase">ENTER REDDIT POST URL</h2>
+                    <p class="text-neutral-500 dark:text-neutral-400 text-xs font-mono max-w-md mx-auto">Provide the link of a Reddit discussion thread to fetch live stats, construct scripts, and render short videos.</p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-3 w-full pt-4">
+                    <input @bind="url" @onkeyup="HandleUrlKeyDown" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-4 py-3 text-sm text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors font-mono" placeholder="https://www.reddit.com/r/..." />
+                    <button @onclick="GetPost" disabled="@(state == GenState.Fetching)" class="bg-neutral-950 dark:bg-white hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black border border-neutral-950 dark:border-white text-xs font-bold font-mono px-8 py-3 rounded transition-colors disabled:opacity-40 disabled:pointer-events-none uppercase tracking-wider whitespace-nowrap">
+                        @if (state == GenState.Fetching)
+                        {
+                            <span>Fetching...</span>
+                        }
+                        else
+                        {
+                            <span>Fetch Content</span>
+                        }
+                    </button>
                 </div>
 
-                @if (post is not null)
+                @if (state.ErrorMessage is not null)
                 {
+                    <div class="w-full border border-red-500/20 bg-red-500/5 p-4 rounded text-left font-mono text-xs text-red-500 dark:text-red-400">
+                        <span class="block font-bold mb-1">⚠ FETCH ERROR</span>
+                        @state.ErrorMessage
+                    </div>
+                }
+                else if (state == GenState.Fetching)
+                {
+                    <div class="flex items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono text-xs pt-2">
+                        <svg class="animate-spin h-4 w-4 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        <span>Scraping Reddit database...</span>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Left panel: Form Controls -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="flex flex-col gap-1.5">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-mono">Active Source URL</span>
+                        <div class="flex gap-2">
+                            <input @bind="url" @onkeyup="HandleUrlKeyDown" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white rounded px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors font-mono" placeholder="https://www.reddit.com/r/..." />
+                            <button @onclick="GetPost" class="bg-neutral-950 dark:bg-white hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black border border-neutral-950 dark:border-white text-xs font-bold font-mono px-6 py-2 rounded transition-colors uppercase tracking-wider">Reload</button>
+                        </div>
+                    </div>
+
                     <div class="border-t border-neutral-200 dark:border-neutral-800 pt-6 space-y-5">
                         <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-mono block">2. Edit Metadata & Script</span>
                         
@@ -75,18 +110,18 @@
                         <div class="flex flex-col gap-2 border-t border-neutral-200 dark:border-neutral-800 pt-4">
                             <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-mono">3. Assets & Style Settings</span>
                             
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
                                 <!-- Subtitles Font Selection & Upload -->
                                 <div class="space-y-2 border border-neutral-200 dark:border-neutral-800 rounded p-3 bg-neutral-50 dark:bg-neutral-950">
                                     <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono block">Subtitles Font</span>
-                                    <select @bind="selectedFont" class="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white rounded px-3 py-1.5 text-xs text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors font-mono">
+                                    <select @bind="selectedFont" @bind:after="SaveFontAsync" class="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white rounded px-3 py-1.5 text-xs text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors font-mono">
                                         <option value="Arial">Arial (System Default)</option>
                                         @foreach (var font in availableFonts)
                                         {
                                             <option value="@font">@font</option>
                                         }
                                     </select>
-                                    <label class="cursor-pointer block bg-neutral-950 hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black border border-neutral-950 dark:border-white px-3 py-1.5 rounded text-[10px] font-bold text-center transition-colors uppercase tracking-wider font-mono">
+                                    <label class="cursor-pointer block bg-neutral-950 dark:bg-white hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black border border-neutral-950 dark:border-white px-3 py-1.5 rounded text-[10px] font-bold text-center transition-colors uppercase tracking-wider font-mono">
                                         Upload Font (.ttf/.otf)
                                         <InputFile OnChange="OnFontFileChange" class="hidden" accept=".ttf,.otf" />
                                     </label>
@@ -103,7 +138,7 @@
                                 <!-- Background Gameplay Selection & Upload -->
                                 <div class="space-y-2 border border-neutral-200 dark:border-neutral-800 rounded p-3 bg-neutral-50 dark:bg-neutral-950">
                                     <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono block">Gameplay Video</span>
-                                    <select @bind="selectedGameplay" class="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white rounded px-3 py-1.5 text-xs text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors font-mono">
+                                    <select @bind="selectedGameplay" @bind:after="SaveGameplayAsync" class="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white rounded px-3 py-1.5 text-xs text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors font-mono">
                                         @if (availableGameplays.Count == 0)
                                         {
                                             <option value="">No videos. Please upload.</option>
@@ -113,7 +148,7 @@
                                             <option value="@vid">@vid</option>
                                         }
                                     </select>
-                                    <label class="cursor-pointer block bg-neutral-950 hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black border border-neutral-950 dark:border-white px-3 py-1.5 rounded text-[10px] font-bold text-center transition-colors uppercase tracking-wider font-mono">
+                                    <label class="cursor-pointer block bg-neutral-950 dark:bg-white hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black border border-neutral-950 dark:border-white px-3 py-1.5 rounded text-[10px] font-bold text-center transition-colors uppercase tracking-wider font-mono">
                                         Upload Gameplay Video
                                         <InputFile OnChange="OnGameplayFileChange" class="hidden" accept=".mp4,.mov,.mkv,.avi" />
                                     </label>
@@ -126,107 +161,112 @@
                                         <span class="text-[10px] text-red-500 block text-center font-mono">@gameplayUploadError</span>
                                     }
                                 </div>
+
+                                <!-- Reddit Title Card Theme Selection -->
+                                <div class="space-y-2 border border-neutral-200 dark:border-neutral-800 rounded p-3 bg-neutral-50 dark:bg-neutral-950 flex flex-col justify-between">
+                                    <div>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono block mb-2">Title Card Style</span>
+                                        <select @bind="cardThemeSelection" @bind:after="SaveThemeAsync" class="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 focus:border-black dark:focus:border-white rounded px-3 py-1.5 text-xs text-neutral-900 dark:text-neutral-100 w-full focus:outline-none transition-colors font-mono">
+                                            <option value="dark">Dark Theme Card</option>
+                                            <option value="light">Light Theme Card</option>
+                                        </select>
+                                    </div>
+                                    <p class="text-[9px] text-neutral-400 dark:text-neutral-500 font-mono leading-relaxed">Selects the SkiaSharp visual theme for the generated title card image.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                }
-            </div>
+                </div>
 
-            <!-- Right panel: Preview / Status -->
-            <div class="lg:col-span-5 flex flex-col justify-start">
-                <div class="flex justify-between items-center mb-3">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-mono">Render Monitor</span>
-                    @if (post is not null)
-                    {
+                <!-- Right panel: Preview / Status -->
+                <div class="lg:col-span-5 flex flex-col justify-start">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-mono">Render Monitor</span>
                         <button @onclick="GetVideo" disabled="@(state != GenState.Idle && state != GenState.Complete && state.ErrorMessage is null)" class="bg-neutral-950 dark:bg-white hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black text-[10px] font-bold font-mono px-4 py-1.5 rounded transition-colors disabled:opacity-40 disabled:pointer-events-none uppercase tracking-widest border border-neutral-950 dark:border-white whitespace-nowrap">
                             @GetButtonLabel()
                         </button>
-                    }
-                </div>
-                <div class="flex flex-col items-center justify-center border border-neutral-200 dark:border-neutral-800 rounded bg-neutral-50 dark:bg-neutral-950 p-4 min-h-[500px] sticky top-8">
-                    @if (state.ErrorMessage is not null)
-                    {
-                        <div class="text-red-500 dark:text-red-400 text-center text-xs font-mono p-4 w-full">
-                            <span class="block text-sm mb-2 font-bold">⚠ ERROR</span>
-                            <div class="border border-red-500/20 bg-red-500/5 p-3 rounded text-left overflow-auto max-h-[350px] text-[11px] font-mono">
-                                @state.ErrorMessage
+                    </div>
+                    <div class="flex flex-col items-center justify-center border border-neutral-200 dark:border-neutral-800 rounded bg-neutral-50 dark:bg-neutral-950 p-4 min-h-[500px] sticky top-8">
+                        @if (state.ErrorMessage is not null)
+                        {
+                            <div class="text-red-500 dark:text-red-400 text-center text-xs font-mono p-4 w-full">
+                                <span class="block text-sm mb-2 font-bold">⚠ ERROR</span>
+                                <div class="border border-red-500/20 bg-red-500/5 p-3 rounded text-left overflow-auto max-h-[350px] text-[11px] font-mono">
+                                    @state.ErrorMessage
+                                </div>
                             </div>
-                        </div>
-                    }
-                    else if (state == GenState.Idle)
-                    {
-                        <div class="text-neutral-400 dark:text-neutral-500 text-center text-xs font-mono uppercase tracking-wider">
-                            Waiting for command sequence...
-                        </div>
-                    }
-                    else if (state == GenState.Fetching)
-                    {
-                        <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
-                            <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                            </svg>
-                            <span class="text-xs uppercase tracking-wider">[FETCHING REDDIT CONTENT]</span>
-                        </div>
-                    }
-                    else if (state == GenState.GeneratingTitleCard)
-                    {
-                        <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
-                            <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                            </svg>
-                            <span class="text-xs uppercase tracking-wider">[GENERATING TITLE CARD PNG]</span>
-                        </div>
-                    }
-                    else if (state == GenState.SynthesizingTitleVoice)
-                    {
-                        <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
-                            <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                            </svg>
-                            <span class="text-xs uppercase tracking-wider">[SYNTHESIZING TITLE TTS AUDIO]</span>
-                        </div>
-                    }
-                    else if (state == GenState.SynthesizingBodyVoice)
-                    {
-                        <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
-                            <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                            </svg>
-                            <span class="text-xs uppercase tracking-wider">[SYNTHESIZING BODY TTS AUDIO]</span>
-                        </div>
-                    }
-                    else if (state == GenState.GeneratingVideo)
-                    {
-                        <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
-                            <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                            </svg>
-                            <span class="text-xs uppercase tracking-wider">[FFMPEG COMPOSITING ENGINE ACTIVE]</span>
-                        </div>
-                    }
-                    else if (state == GenState.Complete && identifier != null)
-                    {
-                        <div class="flex flex-col items-center gap-4 text-center w-full">
-                            <div class="w-full flex justify-between items-center px-1 font-mono text-[10px] text-neutral-500 uppercase">
-                                <span>Output: @(identifier).mp4</span>
-                                <span>Status: RENDERED</span>
+                        }
+                        else if (state == GenState.Idle)
+                        {
+                            <div class="text-neutral-400 dark:text-neutral-500 text-center text-xs font-mono uppercase tracking-wider">
+                                Waiting for command sequence...
                             </div>
-                            <video controls class="w-full max-h-[550px] rounded border border-neutral-200 dark:border-neutral-800" preload="metadata">
-                                <source src="/outputs/@identifier/@(identifier).mp4" type="video/mp4" />
-                            </video>
-                            <a href="/outputs/@identifier/@(identifier).mp4" download="@(identifier).mp4" class="bg-neutral-950 dark:bg-white hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black text-xs font-bold font-mono px-6 py-3 rounded transition-colors inline-flex items-center gap-2 uppercase tracking-widest border border-neutral-950 dark:border-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                Download Render
-                            </a>
-                        </div>
-                    }
+                        }
+                        else if (state == GenState.Fetching)
+                        {
+                            <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
+                                <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                </svg>
+                                <span class="text-xs uppercase tracking-wider">[FETCHING REDDIT CONTENT]</span>
+                            </div>
+                        }
+                        else if (state == GenState.GeneratingTitleCard)
+                        {
+                            <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
+                                <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                </svg>
+                                <span class="text-xs uppercase tracking-wider">[GENERATING TITLE CARD PNG]</span>
+                            </div>
+                        }
+                        else if (state == GenState.SynthesizingTitleVoice)
+                        {
+                            <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
+                                <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                </svg>
+                                <span class="text-xs uppercase tracking-wider">[SYNTHESIZING TITLE TTS AUDIO]</span>
+                            </div>
+                        }
+                        else if (state == GenState.SynthesizingBodyVoice)
+                        {
+                            <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
+                                <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                </svg>
+                                <span class="text-xs uppercase tracking-wider">[SYNTHESIZING BODY TTS AUDIO]</span>
+                            </div>
+                        }
+                        else if (state == GenState.GeneratingVideo)
+                        {
+                            <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400 font-mono">
+                                <svg class="animate-spin h-6 w-6 text-neutral-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                </svg>
+                                <span class="text-xs uppercase tracking-wider">[FFMPEG COMPOSITING ENGINE ACTIVE]</span>
+                            </div>
+                        }
+                        else if (state == GenState.Complete && identifier != null)
+                        {
+                            <div class="flex flex-col items-center gap-4 text-center w-full">
+                                <video controls class="w-full max-h-[550px] rounded border border-neutral-200 dark:border-neutral-800" preload="metadata">
+                                    <source src="/outputs/@identifier/@(identifier).mp4" type="video/mp4" />
+                                </video>
+                                <a href="/outputs/@identifier/@(identifier).mp4" download="@(identifier).mp4" class="bg-neutral-950 dark:bg-white hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white text-white dark:text-black text-xs font-bold font-mono px-6 py-3 rounded transition-colors inline-flex items-center gap-2 uppercase tracking-widest border border-neutral-950 dark:border-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    Download Render
+                                </a>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
+        }
     </div>
 </div>
