@@ -1,7 +1,5 @@
 @page "/"
 @rendermode InteractiveServer
-@using BlazorApp1.Services
-@inject RedditService Reddit
 
 <div class="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-neutral-200 p-6 flex flex-col items-center justify-center transition-colors duration-300">
     <div class="w-full max-w-4xl border border-neutral-200 dark:border-neutral-800 rounded-lg p-6 bg-white dark:bg-black">
@@ -21,12 +19,7 @@
                     </div>
                 </div>
 
-                @if (error is not null)
-                {
-                    <div class="border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 text-xs p-3 rounded">
-                        @error
-                    </div>
-                }
+
 
                 @if (post is not null)
                 {
@@ -71,26 +64,87 @@
                             <label for="lightThemeCheckbox" class="text-xs font-medium text-neutral-700 dark:text-neutral-300 cursor-pointer select-none">Use Light Theme</label>
                         </div>
 
-                        <button @onclick="GetTitleCard" class="bg-neutral-950 dark:bg-white hover:bg-neutral-900 dark:hover:bg-neutral-100 text-white dark:text-black text-sm font-semibold w-full py-2.5 rounded transition-colors">
-                            Generate Card
+                        <button @onclick="GetVideo" disabled="@(state != GenState.Idle && state != GenState.Complete && state.ErrorMessage is null)" class="bg-neutral-950 dark:bg-white hover:bg-neutral-900 dark:hover:bg-neutral-100 text-white dark:text-black text-sm font-semibold w-full py-2.5 rounded transition-colors disabled:opacity-40 disabled:pointer-events-none">
+                            @GetButtonLabel()
                         </button>
                     </div>
                 }
             </div>
 
-            <!-- Preview -->
+            <!-- Preview / Status -->
             <div class="flex flex-col items-center justify-center border border-neutral-200 dark:border-neutral-800 rounded bg-neutral-50 dark:bg-neutral-950 p-4 min-h-[400px]">
-                @if (cardImageBase64 is not null)
+                @if (state.ErrorMessage is not null)
                 {
-                    <img src="@cardImageBase64" class="max-w-full max-h-[500px] rounded border border-neutral-200 dark:border-neutral-800" alt="Preview" />
-                    <span class="mt-4 text-xs text-neutral-500 dark:text-neutral-400">
-                        Saved: <code>/Volumes/realme/Dev/content-farm/reddit/ballers.png</code>
-                    </span>
+                    <div class="text-red-500 dark:text-red-400 text-center text-sm">
+                        <span class="block text-lg mb-1">⚠</span>
+                        @state.ErrorMessage
+                    </div>
                 }
-                else
+                else if (state == GenState.Idle)
                 {
                     <div class="text-neutral-400 dark:text-neutral-500 text-center text-sm">
                         Preview will appear here after generation
+                    </div>
+                }
+                else if (state == GenState.Fetching)
+                {
+                    <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400">
+                        <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        <span class="text-sm">Fetching Reddit post...</span>
+                    </div>
+                }
+                else if (state == GenState.GeneratingTitleCard)
+                {
+                    <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400">
+                        <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        <span class="text-sm">Generating title card...</span>
+                    </div>
+                }
+                else if (state == GenState.SynthesizingTitleVoice)
+                {
+                    <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400">
+                        <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        <span class="text-sm">Synthesizing title voice...</span>
+                    </div>
+                }
+                else if (state == GenState.SynthesizingBodyVoice)
+                {
+                    <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400">
+                        <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        <span class="text-sm">Synthesizing body voice...</span>
+                    </div>
+                }
+                else if (state == GenState.GeneratingVideo)
+                {
+                    <div class="flex flex-col items-center gap-3 text-neutral-500 dark:text-neutral-400">
+                        <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        <span class="text-sm">Generating video with FFmpeg...</span>
+                    </div>
+                }
+                else if (state == GenState.Complete && identifier != null)
+                {
+                    <div class="flex flex-col items-center gap-2 text-center w-full">
+                        <span class="text-green-500 dark:text-green-400 text-2xl">✓</span>
+                        <span class="text-sm text-neutral-700 dark:text-neutral-300 font-medium">Video generated!</span>
+                        <span class="text-xs text-neutral-400 dark:text-neutral-500">@identifier</span>
+                        <video controls class="w-full max-h-[500px] rounded mt-2" preload="metadata">
+                            <source src="/outputs/@identifier/final.mp4" type="video/mp4" />
+                        </video>
                     </div>
                 }
             </div>
@@ -98,90 +152,4 @@
     </div>
 </div>
 
-@code {
-    string url = "https://www.reddit.com/r/buhaydigital/comments/1uf64ez/wfh_things_that_make_me_feel_rich_for_no_reason/";
-    string subredditName = "r/buhaydigital";
-    string subredditIconPath = "";
-    string username = "username";
-    string votes = "4.1K";
-    string comments = "2.2K";
-    string timeAgo = "2d ago";
-    bool isLightTheme = false;
-    
-    string? error;
-    PostData? post;
-    string postTitle = "";
-    string? cardImageBase64;
 
-    public async Task GetPost()
-    {
-        error = null;
-        post = null;
-        cardImageBase64 = null;
-        postTitle = "";
-        username = "username";
-
-        try
-        {
-            post = await Reddit.GetPost(url);
-            postTitle = post.Title;
-            username = post.Author;
-            ExtractSubredditFromUrl();
-        }
-        catch (RedditFetchException ex)
-        {
-            error = ex.Message;
-        }
-        catch (RedditPostNotFoundException ex)
-        {
-            error = ex.Message;
-        }
-    }
-
-    private void ExtractSubredditFromUrl()
-    {
-        if (string.IsNullOrEmpty(url)) return;
-        try
-        {
-            var uri = new Uri(url);
-            var segments = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < segments.Length - 1; i++)
-            {
-                if (segments[i].Equals("r", StringComparison.OrdinalIgnoreCase))
-                {
-                    subredditName = $"r/{segments[i + 1]}";
-                    return;
-                }
-            }
-        }
-        catch
-        {
-            // Keep default
-        }
-    }
-
-    public async Task GetTitleCard()
-    {
-        if (post is null) return;
-        error = null;
-
-        try
-        {
-            var bytes = await Reddit.GenerateTitleCard(
-                postTitle,
-                subredditName,
-                subredditIconPath,
-                isLightTheme,
-                votes,
-                comments,
-                timeAgo,
-                username
-            );
-            cardImageBase64 = $"data:image/png;base64,{Convert.ToBase64String(bytes)}";
-        }
-        catch (Exception ex)
-        {
-            error = $"Failed to generate card: {ex.Message}";
-        }
-    }
-}

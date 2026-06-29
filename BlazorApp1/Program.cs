@@ -14,6 +14,8 @@ builder.Services.AddHttpClient();
 builder.Services.AddSingleton<RedditService>();
 builder.Services.AddSingleton<RedditCardService>();
 builder.Services.AddSingleton<EdgeTtsService>();
+builder.Services.AddSingleton<SubtitleGeneratorService>();
+builder.Services.AddSingleton<FfmpegService>();
 
 
 var app = builder.Build();
@@ -59,6 +61,12 @@ app.UseHttpsRedirection();
 
 app.UseAntiforgery();
 
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "outputs")),
+    RequestPath = "/outputs",
+});
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
