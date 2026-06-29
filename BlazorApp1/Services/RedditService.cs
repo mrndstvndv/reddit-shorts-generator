@@ -32,19 +32,23 @@ public class RedditService(IHttpClientFactory clientFactory, ILogger<RedditServi
         if (postNode is null)
             throw new RedditPostNotFoundException(url, "post container (thing) not found");
 
-        var title = doc.DocumentNode.SelectSingleNode(
+        var rawTitle = doc.DocumentNode.SelectSingleNode(
             "//a[contains(@class, 'title') and contains(@class, 'may-blank')]")?.InnerText.Trim();
 
-        if (title is null)
+        if (rawTitle is null)
             throw new RedditPostNotFoundException(url, "title not found");
+
+        var title = System.Net.WebUtility.HtmlDecode(rawTitle);
 
         var bodyNode = postNode.SelectSingleNode(".//div[contains(@class, 'usertext-body')]//div[contains(@class, 'md')]");
         if (bodyNode is null)
             throw new RedditPostNotFoundException(url, "body node not found");
 
-        var body = bodyNode.InnerText.Trim();
-        if (string.IsNullOrEmpty(body))
+        var rawBody = bodyNode.InnerText.Trim();
+        if (string.IsNullOrEmpty(rawBody))
             throw new RedditPostNotFoundException(url, "body text is empty");
+
+        var body = System.Net.WebUtility.HtmlDecode(rawBody);
 
         var author = postNode.GetAttributeValue("data-author", string.Empty);
         if (string.IsNullOrEmpty(author))
